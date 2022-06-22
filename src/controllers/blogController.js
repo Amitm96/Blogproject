@@ -1,27 +1,36 @@
 const blogModel = require("../models/blogModel");
 const authorModel = require("../models/authorModel")
 
+const isValid = function(val){
+    if(typeof val === "undefined" || val === null) return false
+    if(typeof val === "string" && val.trim().length === 0 ) return false
+    return true;
+}
+
+const bodyValidator = function(data){
+    return Object.keys(data).length > 0
+}
+
 let createBlog = async function (req, res) {
     try {
         let Data = req.body;
-        if (Data.title != undefined && Data.body != undefined && Data.authorId != undefined && Data.category != undefined) {
-            let isValidAuth = await authorModel.findById(Data.authorId)
-            if (isValidAuth) {
-                let saveData = await blogModel.create(Data);
-                res.status(201).send({ msg: saveData })
-            }
-            else {
-                res.status(400).send({ error: "error in authorid" })
-            }
-        }
-        else {
-            res.status(400).send({ error: "enter all the field details correctly" })
-        }
+        if(!bodyValidator(Data)) return res.status(400).send({status : false , msg : "please enter body"})
+        if(!isValid(Data.title)) return res.status(400).send({status : false , msg : "please enter title"})
+        if(!isValid(Data.body)) return res.status(400).send({status : false , msg : "please enter body"})
+        if(!isValid(Data.authorId)) return res.status(400).send({status : false , msg : "please enter authorId"})
+        if(!isValid(Data.category)) return res.status(400).send({status : false , msg : "please enter category"})
+        
+        let isValidAuth = await authorModel.findById(Data.authorId)
+        if(isValidAuth === null) res.status(400).send({status: false , msg: "please enter correct authorid"})
+        
+        let blog = await blogModel.create(Data)
+        res.status(201).send({status: true , msg: "blog created successfully"})
     }
     catch (err) {
         res.status(500).send({ status: false, msg: "SERVER ISSUES", reason: err.message })
     }
 }
+
 
 const updatedBlogs = async function(req , res){
     try{
@@ -44,6 +53,8 @@ const updatedBlogs = async function(req , res){
                 
             }
             blog.isPublished = true
+            let date = new Date()
+            blog.publishedAt = date
             blog.save()
             res.status(200).send({status: true , data: blog})
         }
@@ -70,7 +81,7 @@ const deleteBlog = async function (req, res) {
             }
         }
         else {
-            res.status(404).send({ status: flase, msg: "" })
+            res.status(404).send({ status: flase, msg: "blog is not found" })
         }
     }
     catch(err){
