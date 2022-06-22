@@ -61,9 +61,9 @@ const getBlogs = async function (req, res) {
    
        let savedData = await blogModel.find(obj)
        if (savedData.length == 0) {
-           return res.status(400).send({ status: true, msg: "No such Blogs Available" })
+           return res.status(400).send({ status: false , msg: "No such Blogs Available" })
        } else {
-           return res.status(200).send({ msg: savedData })
+           return res.status(200).send({status: true,  data: savedData })
        } }catch(err){
            res.status(500).send({ msg: err.message })
        }
@@ -108,9 +108,6 @@ const updatedBlogs = async function(req , res){
 
 }
 
-
-
-
 const deleteBlog = async function (req, res) {
     try {
         let blogId = req.params.blogId
@@ -125,7 +122,7 @@ const deleteBlog = async function (req, res) {
             }
         }
         else {
-            res.status(404).send({ status: flase, msg: "blog dosen't exist" })
+            res.status(404).send({ status: false, msg: "blog dosen't exist" })
         }
     }
     catch(err){
