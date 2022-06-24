@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken')
 const blogModel = require('../models/blogModel')
+
+
 const authenticate = function(req , res , next){
     try{
         let token = req.headers["x-api-key"]
@@ -16,6 +18,7 @@ const authenticate = function(req , res , next){
     }
     
 }
+
 
 const authorization = async function(req , res , next){
     try{

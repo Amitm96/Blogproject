@@ -32,8 +32,6 @@ let createBlog = async function (req, res) {
     }
 }
 
-
-
 const getBlogs = async function (req, res) {
     try { 
        let authorId = req.query.authorId
@@ -69,9 +67,6 @@ const getBlogs = async function (req, res) {
        }
    }
    
-
-
-
 const updatedBlogs = async function(req , res){
     try{
         let {title , body , tags , subcategory} = req.body
@@ -84,13 +79,21 @@ const updatedBlogs = async function(req , res){
                 blog.body = body
             }
             if(tags){
-                blog.tags.push(tags)
+                if(typeof tags == "object"){
+                    for(let i of tags){
+                        blog.tags.push(i)
+                    }
+                }
+              
             
             }
             if(subcategory){
-                blog.subcategory.push(subcategory)
-                
-            }
+                if(typeof subcategory == "object"){
+                    for(let i of subcategory){
+                        blog.subcategory.push(i)
+                    }
+                }
+            }   
             blog.isPublished = true
             let date = new Date();
             blog.publishedAt = date
@@ -114,7 +117,7 @@ const deleteBlog = async function (req, res) {
             if (blog.isDeleted == false) {
                 blog.isDeleted = true
                 blog.save()
-                res.status(200).send({status:true,})
+                res.status(200).send({status:true})
             } else{
                 res.status(404).send({msg : "already deleted"})
             }
@@ -129,8 +132,6 @@ const deleteBlog = async function (req, res) {
     
 }
 
-
-
 const deleteBlogByQuery = async function(req , res){
     try{
         let category = req.query.category
@@ -138,7 +139,8 @@ const deleteBlogByQuery = async function(req , res){
         let subcategory = req.query.subcategory
 
         let obj = {authorId : req.authorId , isPublished: false};
-
+       
+        let date = new Date();
         
         if (category) {
             obj.category = category
@@ -152,7 +154,10 @@ const deleteBlogByQuery = async function(req , res){
         
 
         let blogs = await blogModel.find(obj)
-        // console.log(blogs);
+     
+        if(blogs.length > 0){
+        
+            let updatedBlogs = await blogModel.updateMany(obj,{$set: {isDeleted : true, deletedAt: date}})
         if(blogs.length > 0){
             // let blogIds = blogs.map(e => e._id)
             let updatedBlogs = await blogModel.updateMany(obj,{$set: {isDeleted : true}})
@@ -175,3 +180,4 @@ module.exports.getBlogs = getBlogs
 module.exports.updatedBlogs = updatedBlogs;
 module.exports.deleteBlog = deleteBlog;
 module.exports.deleteBlogByQuery = deleteBlogByQuery;
+
