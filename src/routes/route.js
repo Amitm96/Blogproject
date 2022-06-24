@@ -8,9 +8,6 @@ const blogController= require("../controllers/blogController")
 const middleware = require("../middleware/auth")
 
 
-
-
-
 router.post("/authors", authorController.createAuthor)
 router.post("/login" , authorController.authorLogin)
 router.post("/blogs", middleware.authenticate ,  blogController.createBlog)

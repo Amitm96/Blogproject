@@ -1,3 +1,4 @@
+
 const authorModel = require('../models/authorModel');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
@@ -37,10 +38,6 @@ const createAuthor = async function (req, res) {
     }
 }
 
-
-
-
-
 const authorLogin = async function (req, res) {
     try {
         let data = req.body
@@ -61,3 +58,4 @@ const authorLogin = async function (req, res) {
 }
 
 module.exports = { createAuthor, authorLogin }
+

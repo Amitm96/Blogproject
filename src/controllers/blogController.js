@@ -1,3 +1,4 @@
+
 const blogModel = require("../models/blogModel");
 const authorModel = require("../models/authorModel")
 
@@ -30,10 +31,6 @@ let createBlog = async function (req, res) {
         res.status(500).send({ status: false, msg: "SERVER ISSUES", reason: err.message })
     }
 }
-
-
-
-
 
 const getBlogs = async function (req, res) {
     try { 
@@ -69,13 +66,6 @@ const getBlogs = async function (req, res) {
            res.status(500).send({ msg: err.message })
        }
    }
-   
-
-
-
-
-
-
    
 const updatedBlogs = async function(req , res){
     try{
@@ -120,9 +110,6 @@ const updatedBlogs = async function(req , res){
 
 }
 
-
-
-
 const deleteBlog = async function (req, res) {
     try {
         let blog = req.blog
@@ -144,10 +131,6 @@ const deleteBlog = async function (req, res) {
     }
     
 }
-
-
-
-
 
 const deleteBlogByQuery = async function(req , res){
     try{
@@ -175,6 +158,9 @@ const deleteBlogByQuery = async function(req , res){
         if(blogs.length > 0){
         
             let updatedBlogs = await blogModel.updateMany(obj,{$set: {isDeleted : true, deletedAt: date}})
+        if(blogs.length > 0){
+            // let blogIds = blogs.map(e => e._id)
+            let updatedBlogs = await blogModel.updateMany(obj,{$set: {isDeleted : true}})
             res.status(200).send({status : true})
         }
         else{
@@ -194,3 +180,4 @@ module.exports.getBlogs = getBlogs
 module.exports.updatedBlogs = updatedBlogs;
 module.exports.deleteBlog = deleteBlog;
 module.exports.deleteBlogByQuery = deleteBlogByQuery;
+

@@ -2,19 +2,14 @@ const jwt = require('jsonwebtoken')
 const blogModel = require('../models/blogModel')
 
 
-
-
-
 const authenticate = function(req , res , next){
     try{
         let token = req.headers["x-api-key"]
-        if(!token){
-             return res.status(401).send({status: false , msg: "please provide token"})}
-        let decodedToken = jwt.verify(token , "first-project")
-        if(!decodedToken) {
-            return res.status(401).send({status: false , msg: "token not valid"})}
+        if(!token) return res.status(401).send({status: false , msg: "please provide token"})
+        let encodedToken = jwt.verify(token , "first-project")
+        if(!encodedToken) return res.status(401).send({status: false , msg: "token not valid"})
         else{
-            req.decodedToken = decodedToken
+            req.encodedToken = encodedToken
             next()
         } 
     }
@@ -25,18 +20,13 @@ const authenticate = function(req , res , next){
 }
 
 
-
-
 const authorization = async function(req , res , next){
     try{
-        
-        let decodedToken = req.decodedToken
         let blogId = req.params.blogId
         let blog = await blogModel.findById(blogId)
         if(!blog) return res.status(400).send({status : false , msg: "blog is not present"})
-        
-        if(blog.authorId != decodedToken.authorId) {  
-        return res.status(403).send({status: false , msg:"Unauthorized Author"})}
+        let encodedToken = req.encodedToken
+        if(blog.authorId != encodedToken.authorId) return res.status(403).send({status: false , msg:"Not authorized to access the blog"})
         else{
             req.blog = blog
             next()
@@ -47,20 +37,14 @@ const authorization = async function(req , res , next){
     }
 }
 
-
-
-
-
 const queryDeleteAuth = async function(req , res , next){
     try{
-        let decodedToken = req.decodedToken
+        let encodedToken = req.encodedToken
         let qAuthorId = req.query.authorId
-        if(decodedToken.authorId != qAuthorId && qAuthorId!= undefined) 
-        {return res.status(400).send({status:false , msg: "Unauthorized Author"})}
-
+        if(encodedToken.authorId != qAuthorId && qAuthorId!= undefined) return res.status(400).send({status:false , msg: "can not access different authorid"})
         else{
-            req.authorId = decodedToken.authorId
-            next();
+            req.authorId = encodedToken.authorId
+            next()
         }
     }
     catch(err){
@@ -68,8 +52,5 @@ const queryDeleteAuth = async function(req , res , next){
     }
 }
 
-
-
-
-
 module.exports = {authenticate , authorization , queryDeleteAuth}
+
