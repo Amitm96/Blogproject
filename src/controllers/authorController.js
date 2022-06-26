@@ -1,7 +1,7 @@
 
 const authorModel = require('../models/authorModel');
 const validator = require('validator');
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
 const isValid = function (val) {
     if (typeof val === "undefined" || val === null) return false
@@ -25,7 +25,6 @@ const createAuthor = async function (req, res) {
         if (!isValid(data.fname) || !regexValidator(data.fname)) return res.status(400).send({ status: false, msg: "please enter first name correctly" })
         if (!isValid(data.lname) || !regexValidator(data.lname)) return res.status(400).send({ status: false, msg: "please enter last name correctly" })
         if (!isValid(data.title) || !titleValues.includes(data.title)) return res.status(400).send({ status: false, msg: "please enter title correctly" })
-
         if (!isValid(data.email)) return res.status(400).send({ status: false, msg: "please enter email" })
         if (!isValid(data.password)) return res.status(400).send({ status: false, msg: "please enter password" })
 

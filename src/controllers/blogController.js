@@ -1,11 +1,6 @@
 
 const blogModel = require("../models/blogModel");
 const authorModel = require("../models/authorModel")
-const jwt = require("jsonwebtoken");
-
-const bodyValidator = function(data){
-    return Object.keys(data).length > 0
-}
 
 const isValid = function(val){
     if(typeof val === "undefined" || val === null) return false
@@ -15,6 +10,9 @@ const isValid = function(val){
     return true;
 }
 
+const bodyValidator = function(data){
+    return Object.keys(data).length > 0
+}
 
 let createBlog = async function (req, res) {
     try {
@@ -144,7 +142,6 @@ const deleteBlog = async function (req, res) {
 
 const deleteBlogByQuery = async function(req , res){
     try{
-      
         let category = req.query.category
         let tags = req.query.tags
         let subcategory = req.query.subcategory
@@ -162,17 +159,18 @@ const deleteBlogByQuery = async function(req , res){
             obj.subcategory = subcategory
         }
         
+
         let blogs = await blogModel.find(obj)
+        // console.log(blogs);
         if(blogs.length > 0){
-          
             let date = new Date()
             let updatedBlogs = await blogModel.updateMany(obj,{$set: {isDeleted : true , deletedAt: date}})
-
             res.status(200).send({status : true})
         }
         else{
             res.status(404).send({status : false , msg: "no such blog available"})
         }
+        
     }
     catch(err){
         res.status(500).send({msg : err.message})
