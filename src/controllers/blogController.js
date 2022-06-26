@@ -5,6 +5,8 @@ const authorModel = require("../models/authorModel")
 const isValid = function(val){
     if(typeof val === "undefined" || val === null) return false
     if(typeof val === "string" && val.trim().length === 0 ) return false
+    if(typeof val === "number" || typeof val === "boolean") return false
+    if(typeof val === "object" && val.length === 0) return false
     return true;
 }
 
@@ -76,20 +78,25 @@ const updatedBlogs = async function(req , res){
     try{
         let {title , body , tags , subcategory} = req.body
         let blog = req.blog
+        if(!bodyValidator(req.body)) return res.status(400).send({status: false , msg: "please enter body"})
         if(blog.isDeleted === false){
-            if(title){
-                blog.title = title
+            if(isValid(title)) blog.title = title
+            if(isValid(body)) blog.body = body
+            if(isValid(tags)){
+                if(typeof tags == "object"){
+                    for(e of tags){
+                        blog.tags.push(e)
+                    }
+                }
+                else blog.tags.push(tags)
             }
-            if(body){
-                blog.body = body
-            }
-            if(tags){
-                blog.tags.push(tags)
-            
-            }
-            if(subcategory){
-                blog.subcategory.push(subcategory)
-                
+            if(isValid(subcategory)){
+                if(typeof subcategory == "object"){
+                    for(e of subcategory){
+                        blog.subcategory.push(e)
+                    }
+                }
+                else blog.subcategory.push(subcategory)
             }
             blog.isPublished = true
             let date = new Date();
@@ -113,6 +120,8 @@ const deleteBlog = async function (req, res) {
         if (blog) {
             if (blog.isDeleted == false) {
                 blog.isDeleted = true
+                let date = new Date()
+                blog.deletedAt = date
                 blog.save()
                 res.status(200).send({status:true,})
             } else{
@@ -154,8 +163,8 @@ const deleteBlogByQuery = async function(req , res){
         let blogs = await blogModel.find(obj)
         // console.log(blogs);
         if(blogs.length > 0){
-            // let blogIds = blogs.map(e => e._id)
-            let updatedBlogs = await blogModel.updateMany(obj,{$set: {isDeleted : true}})
+            let date = new Date()
+            let updatedBlogs = await blogModel.updateMany(obj,{$set: {isDeleted : true , deletedAt: date}})
             res.status(200).send({status : true})
         }
         else{

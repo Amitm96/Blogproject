@@ -9,17 +9,22 @@ const isValid = function (val) {
     return true;
 }
 
+const regexValidator = function(val){
+    let regx = /^[a-zA-z]+([\s][a-zA-Z]+)*$/;
+    return regx.test(val);
+}
+
 const bodyValidator = function (data) {
     return Object.keys(data).length > 0
 }
 const createAuthor = async function (req, res) {
     try {
         let data = req.body
-
+        let titleValues = ["Mr","Mrs", "Miss"];
         if (!bodyValidator(data)) return res.status(400).send({ status: false, msg: "please enter body" })
-        if (!isValid(data.fname)) return res.status(400).send({ status: false, msg: "please enter first name" })
-        if (!isValid(data.lname)) return res.status(400).send({ status: false, msg: "please enter last name" })
-        if (!isValid(data.title)) return res.status(400).send({ status: false, msg: "please enter title" })
+        if (!isValid(data.fname) || !regexValidator(data.fname)) return res.status(400).send({ status: false, msg: "please enter first name correctly" })
+        if (!isValid(data.lname) || !regexValidator(data.lname)) return res.status(400).send({ status: false, msg: "please enter last name correctly" })
+        if (!isValid(data.title) || !titleValues.includes(data.title)) return res.status(400).send({ status: false, msg: "please enter title correctly" })
         if (!isValid(data.email)) return res.status(400).send({ status: false, msg: "please enter email" })
         if (!isValid(data.password)) return res.status(400).send({ status: false, msg: "please enter password" })
 
