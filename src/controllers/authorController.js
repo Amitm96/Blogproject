@@ -46,11 +46,11 @@ const createAuthor = async function (req, res) {
 const authorLogin = async function (req, res) {
     try {
         let data = req.body
-        if (!(bodyValidator(data))) res.status(400).send({ status: false, msg: "please enter something in body" })
-        if (!isValid(data.email)) res.status(400).send({ status: false, msg: "please enter email" })
-        if (!isValid(data.password)) res.status(400).send({ status: false, msg: "please enter password" })
+        if (!(bodyValidator(data))) return res.status(400).send({ status: false, msg: "please enter something in body" })
+        if (!isValid(data.email)) return res.status(400).send({ status: false, msg: "please enter email" })
+        if (!isValid(data.password)) return res.status(400).send({ status: false, msg: "please enter password" })
         let author = await authorModel.findOne({ email: data.email, password: data.password })
-        if (!author) res.status(400).send({ satus: false, msg: "login failed, please provide correct email and password" })
+        if (!author) return res.status(400).send({ satus: false, msg: "login failed, please provide correct email and password" })
         else {
             let token = jwt.sign({ authorId: author._id.toString(), groupNo: "20", batch: "Radon" }, "first-project");
             res.setHeader("x-api-key", token)
